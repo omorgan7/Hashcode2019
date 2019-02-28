@@ -13,7 +13,7 @@ def lazySolution(photos):
     return solution
 
 def solution2(photos):
-    photos.sort(key=lambda photo : photo.index, reverse=True)
+    # photos.sort(key=lambda photo : photo.index, reverse=True)
     return lazySolution(photos)
         
 
@@ -26,9 +26,13 @@ class Photo:
 class Slide:
     def __init__(self, *args):
         self.tags = set(args[0].tags)
+        self.indexes = list()
+        self.indexes.append(args[0].index)
         if len(args) > 1:
+            self.indexes.append(args[1].index)
             for tag in args[1].tags:
                 self.tags.add(tag)
+                
         
 def common(slide1, slide2):
     solution = list()
@@ -67,18 +71,12 @@ solution = solution2(photos)
 for x in solution:
     print(x.tags)
 
-print(score(solution[0], solution[1]))
-print(score(solution[1], solution[2]))
-
 fileOut.write("%d" % len(solution))
 fileOut.write("\n")
 
-for numbers in solution:
-    if type(numbers) is list:
-        for x in numbers:
-            fileOut.write("%d " % x.index)
-        fileOut.write("\n")
-    else:
-        fileOut.write("%d\n" % numbers.index)
+for slide in solution:
+    for index in slide.indexes:
+        fileOut.write("%d " % index)
+    fileOut.write("\n")
 
 fileOut.close()
