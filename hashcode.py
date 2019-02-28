@@ -1,13 +1,14 @@
 def lazySolution(photos):
     solution = list()
     verticalJoin = list()
+    slides = list()
     for photo in photos:
         if photo.orientation is "H":
-            solution.append(photo.index)
+            solution.append(Slide(photo))
         else:
-            verticalJoin.append(photo.index)
+            verticalJoin.append(photo)
             if len(verticalJoin) is 2:
-                solution.append(verticalJoin)
+                solution.append(Slide(*verticalJoin))
                 verticalJoin = list()
     return solution
 
@@ -25,14 +26,21 @@ class Photo:
 class Slide:
     def __init__(self, *args):
         self.tags = set(args[0].tags)
-        if args[1]:
-            self.tags.append(args[1].tags)
+        if len(args) > 1:
+            for tag in args[1].tags:
+                self.tags.add(tag)
         
 def common(slide1, slide2):
-    return len(set(slide1.tags, slide2.tags))
+    solution = list()
+    
+    for tag in slide2.tags:
+        if tag in slide1.tags:
+            solution.append(tag)
+
+    return len(solution)
     
 def subtract(slide1, slide2):
-    tags = tags(slide1)
+    tags = slide1.tags
     for tag in slide2.tags:
         if tag in tags:
             tags.remove(tag)
@@ -48,7 +56,7 @@ photos = list()
 for index, line in enumerate(fileIn):
     if index == 0:
         continue
-    photos.append(Photo(line[0], list(line[2:].replace('\n', '').split(" ")), index - 1))
+    photos.append(Photo(line[0], list((line[2:].replace('\n', '').split(" "))[1:]), index - 1))
 
 fileIn.close()
 
@@ -56,15 +64,21 @@ fileOut = open("output.txt", "w")
 
 solution = solution2(photos)
 
+for x in solution:
+    print(x.tags)
+
+print(score(solution[0], solution[1]))
+print(score(solution[1], solution[2]))
+
 fileOut.write("%d" % len(solution))
 fileOut.write("\n")
 
 for numbers in solution:
     if type(numbers) is list:
         for x in numbers:
-            fileOut.write("%d " % x)
+            fileOut.write("%d " % x.index)
         fileOut.write("\n")
     else:
-        fileOut.write("%d\n" % numbers)
+        fileOut.write("%d\n" % numbers.index)
 
 fileOut.close()
